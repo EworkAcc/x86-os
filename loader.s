@@ -3,10 +3,6 @@ global loader
   FLAGS equ 0x0
   CHECKSUM equ -MAGIC_NUMBER
 
-global outb
-
-global inb
-
 KERNEL_STACK_SIZE equ 4096
 
   section .bss
@@ -19,17 +15,6 @@ KERNEL_STACK_SIZE equ 4096
     dd MAGIC_NUMBER
     dd FLAGS
     dd CHECKSUM
-
-  outb:
-    mov al, [esp + 8]
-    mov dx, [esp + 4]
-    out dx, al
-    ret
-
-  inb:
-    mov dx, [esp + 4]
-    in al, dx 
-    ret
 
   loader:
     mov esp, kernel_stack + KERNEL_STACK_SIZE

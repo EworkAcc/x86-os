@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o drivers.o
+OBJECTS = loader.o io.o kmain.o fb_driver.o sp_driver.o 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c

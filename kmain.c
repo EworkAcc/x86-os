@@ -1,5 +1,6 @@
 #include "io.h"
 #include "sp.h"
+#include "fb.h"
 
 int main() {
   char hello[] = "Hello World!";
