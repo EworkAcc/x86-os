@@ -2,13 +2,21 @@
 #include "sp.h"
 #include "fb.h"
 #include "seg.h"
+#include "pic.h"
+#include "interrupt.h"
+#include "kb.h"
 
 int main() {
-  char hello[] = "Hello World!";
+  unsigned char scancode, ascii;
+  char asciicode[4000];
 
-  fb_write(hello, 12);
-  serial_write(0x3F8, hello, 12);
   segments_install_gdt();
+
+  interrupts_install_idt();
+  scancode = keyboard_read_scan_code();
+  ascii = keyboard_scan_code_to_ascii(scancode);
+  asciicode[0] = ascii;
+  serial_write((char *)asciicode, sizeof(asciicode));
 
   return 0;
 }

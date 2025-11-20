@@ -10,7 +10,7 @@ KERNEL_STACK_SIZE equ 4096
   kernel_stack:
     resb KERNEL_STACK_SIZE
 
-  section .text:
+  section .text
   align 4
     dd MAGIC_NUMBER
     dd FLAGS
@@ -23,4 +23,4 @@ KERNEL_STACK_SIZE equ 4096
   call main
 
   .loop:
-   jmp .loop
+    jmp .loop

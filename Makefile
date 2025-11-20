@@ -1,10 +1,10 @@
-OBJECTS = loader.o io.o gdt.o kmain.o fb_driver.o seg_driver.o sp_driver.o 
+OBJECTS = loader.o io.o gdt.o idt.o interrupt_handler.o kmain.o fb_driver.o seg_driver.o sp_driver.o interrupt_driver.o pic_driver.o kb_driver.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
-ASFLAGS = -f elf
+ASFLAGS = -f elf32
 
 all: kernel.elf
 
