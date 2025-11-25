@@ -35,3 +35,5 @@ run: os.iso
 
 clean:
 	rm -rf *.o kernel.elf os.iso
+	rm -rf iso/boot/kernel.elf
+	rm -rf iso/modules/*.o
