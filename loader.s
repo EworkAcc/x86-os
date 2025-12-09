@@ -1,7 +1,8 @@
 global loader
-  MAGIC_NUMBER equ 0x1BADB002
+  MAGIC_NUMBER equ 0x1badb002
+  ALIGN_MODULES equ 0x00000001
+  CHECKSUM equ -(MAGIC_NUMBER + ALIGN_MODULES)
   FLAGS equ 0x0
-  CHECKSUM equ -MAGIC_NUMBER
 
 KERNEL_STACK_SIZE equ 4096
 
@@ -13,14 +14,18 @@ KERNEL_STACK_SIZE equ 4096
   section .text
   align 4
     dd MAGIC_NUMBER
-    dd FLAGS
+    dd ALIGN_MODULES
     dd CHECKSUM
+    dd FLAGS
 
   loader:
     mov esp, kernel_stack + KERNEL_STACK_SIZE
-    extern main
+    
+    push ebx
 
-  call main
+    extern kmain
+
+    call kmain
 
   .loop:
     jmp .loop
