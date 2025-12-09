@@ -1,113 +1,170 @@
-#define MULTIBOOT_HEADER_MAGIC 0x1badb002
+#ifndef MULTIBOOT_HEADER
 
-#ifdef __ELF__
-#define MULTIBOOT_HEADER_FLAGS 0x00000003
-#else
-#define MULTIBOOT_HEADER_FLAGS 0x00010003
-#endif
+#define MULTIBOOT_HEADER 1
+#define MULTIBOOT_SEARCH 8192
+#define MULTIBOOT_HEADER_ALIGN 4
+#define MULTIBOOT_HEADER_MAGIC 0x1BADB002
+#define MULTIBOOT_BOOTLOADER_MAGIC 0x2BADB002
+#define MULTIBOOT_MOD_ALIGN 0x00001000
+#define MULTIBOOT_INFO_ALIGN 0x00000004
+#define MULTIBOOT_PAGE_ALIGN 0x00000001
+#define MULTIBOOT_MEMORY_INFO 0x00000002
+#define MULTIBOOT_VIDEO_MODE 0x00000004
+#define MULTIBOOT_AOUT_KLUDGE 0x00010000
+#define MULTIBOOT_INFO_MEMORY 0x00000001
+#define MULTIBOOT_INFO_BOOTDEV 0x00000002
+#define MULTIBOOT_INFO_CMDLINE 0x00000004
+#define MULTIBOOT_INFO_MODS 0x00000008
+#define MULTIBOOT_INFO_AOUT_SYMS 0x00000010
+#define MULTIBOOT_INFO_ELF_SHDR 0X00000020
+#define MULTIBOOT_INFO_MEM_MAP 0x00000040
+#define MULTIBOOT_INFO_DRIVE_INFO 0x00000080
+#define MULTIBOOT_INFO_CONFIG_TABLE 0x00000100
+#define MULTIBOOT_INFO_BOOT_LOADER_NAME 0x00000200
+#define MULTIBOOT_INFO_APM_TABLE 0x00000400
+#define MULTIBOOT_INFO_VBE_INFO 0x00000800
+#define MULTIBOOT_INFO_FRAMEBUFFER_INFO 0x00001000
 
-#define MULTIBOOT_BOOTLOADER_MAGIC 0x2badb002
-#define STACK_SIZE 0x4000
+#ifndef ASM_FILE
 
-#ifdef HAVE_ASM_USCORE
-#define EXT_C(sym) _ ## sym
-#else
-#define EXT_C(sym) sym
-#endif
+typedef unsigned char multiboot_uint8_t;
+typedef unsigned short multiboot_uint16_t;
+typedef unsigned int multiboot_uint32_t;
+typedef unsigned long long multiboot_uint64_t;
 
-#ifndef ASM
+struct multiboot_header
+{
+  multiboot_uint32_t magic;
+  multiboot_uint32_t flags;
+  multiboot_uint32_t checksum;
+  multiboot_uint32_t header_addr;
+  multiboot_uint32_t load_addr;
+  multiboot_uint32_t load_end_addr;
+  multiboot_uint32_t bss_end_addr;
+  multiboot_uint32_t entry_addr;
+  multiboot_uint32_t mode_type;
+  multiboot_uint32_t width;
+  multiboot_uint32_t height;
+  multiboot_uint32_t depth;
+};
 
-typedef struct multiboot_header {
-  unsigned long magic;
-  unsigned long flags;
-  unsigned long checksum;
-  unsigned long header_addr;
-  unsigned long long_addr;
-  unsigned long long_end_addr;
-  unsigned long bss_end_addr;
-  unsigned long entry_addr;
-} multiboot_header_t;
+struct multiboot_aout_symbol_table
+{
+  multiboot_uint32_t tabsize;
+  multiboot_uint32_t strsize;
+  multiboot_uint32_t addr;
+  multiboot_uint32_t reserved;
+};
+typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;
 
-typedef struct aout_symbol_table {
-  unsigned long tabsize;
-  unsigned long strsize;
-  unsigned long addr;
-  unsigned long reserved;
-} aout_symbol_table_t;
+struct multiboot_elf_section_header_table
+{
+  multiboot_uint32_t num;
+  multiboot_uint32_t size;
+  multiboot_uint32_t addr;
+  multiboot_uint32_t shndx;
+};
+typedef struct multiboot_elf_section_header_table multiboot_elf_section_header_table_t;
 
-typedef struct elf_section_header_table {
-  unsigned long num;
-  unsigned long size;
-  unsigned long addr;
-  unsigned long shndx;
-} elf_section_header_table_t;
-
-typedef struct multiboot_info {
-  unsigned long flags;
-  unsigned long mem_lower;
-  unsigned long mem_upper;
-  unsigned long boot_device;
-  unsigned long cmdline;
-  unsigned long mods_count;
-  unsigned long mods_addr;
-  union {
-    aout_symbol_table_t auout_sym;
-    elf_section_header_table_t elf_sec;
+struct multiboot_info
+{
+  multiboot_uint32_t flags;
+  multiboot_uint32_t mem_lower;
+  multiboot_uint32_t mem_upper;
+  multiboot_uint32_t boot_device;
+  multiboot_uint32_t cmdline;
+  multiboot_uint32_t mods_count;
+  multiboot_uint32_t mods_addr;
+  union
+  {
+    multiboot_aout_symbol_table_t aout_sym;
+    multiboot_elf_section_header_table_t elf_sec;
   } u;
-  unsigned long mmap_length;
-  unsigned long mmap_addr;
-} multiboot_info_t;
+  multiboot_uint32_t mmap_length;
+  multiboot_uint32_t mmap_addr;
+  multiboot_uint32_t drives_length;
+  multiboot_uint32_t drives_addr;
+  multiboot_uint32_t config_table;
+  multiboot_uint32_t boot_loader_name;
+  multiboot_uint32_t apm_table;
+  multiboot_uint32_t vbe_control_info;
+  multiboot_uint32_t vbe_mode_info;
+  multiboot_uint16_t vbe_mode;
+  multiboot_uint16_t vbe_interface_seg;
+  multiboot_uint16_t vbe_interface_off;
+  multiboot_uint16_t vbe_interface_len;
+  multiboot_uint64_t framebuffer_addr;
+  multiboot_uint32_t framebuffer_pitch;
+  multiboot_uint32_t framebuffer_width;
+  multiboot_uint32_t framebuffer_height;
+  multiboot_uint8_t framebuffer_bpp;
+#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED 0
+#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB 1
+#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT 2
+  multiboot_uint8_t framebuffer_type;
+  union
+  {
+    struct
+    {
+      multiboot_uint32_t framebuffer_palette_addr;
+      multiboot_uint16_t framebuffer_palette_num_colors;
+    };
+    struct
+    {
+      multiboot_uint8_t framebuffer_red_field_position;
+      multiboot_uint8_t framebuffer_red_mask_size;
+      multiboot_uint8_t framebuffer_green_field_position;
+      multiboot_uint8_t framebuffer_green_mask_size;
+      multiboot_uint8_t framebuffer_blue_field_position;
+      multiboot_uint8_t framebuffer_blue_mask_size;
+    };
+  };
+};
+typedef struct multiboot_info multiboot_info_t;
 
-typedef struct module {
-  unsigned long mod_start;
-  unsigned long mod_end;
-  unsigned long string;
-  unsigned long reserved;
-} module_t;
+struct multiboot_color
+{
+  multiboot_uint8_t red;
+  multiboot_uint8_t green;
+  multiboot_uint8_t blue;
+};
 
-typedef struct memory_map {
-  unsigned long size;
-  unsigned long base_addr_low;
-  unsigned long base_addr_high;
-  unsigned long length_low;
-  unsigned long length_high;
-  unsigned long type;
-} memory_map_t;
+struct multiboot_mmap_entry
+{
+  multiboot_uint32_t size;
+  multiboot_uint64_t addr;
+  multiboot_uint64_t len;
+#define MULTIBOOT_MEMORY_AVAILABLE              1
+#define MULTIBOOT_MEMORY_RESERVED               2
+#define MULTIBOOT_MEMORY_ACPI_RECLAIMABLE       3
+#define MULTIBOOT_MEMORY_NVS                    4
+#define MULTIBOOT_MEMORY_BADRAM                 5
+  multiboot_uint32_t type;
+} __attribute__((packed));
+typedef struct multiboot_mmap_entry multiboot_memory_map_t;
 
-#endif
-{/*
-#define CHECK_FLAG(flags,bit) ((flags) & (1 << (bit))) 
-  printf("flags = 0x%x\n", (unsigned) mbi->flags);
-  if(CHECK_FLAG(mbi->flags, 0)) 
-    printf("mem_lower =%uKB, mem_dupper = %uKB\n", (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
-  if(CHECK_FLAG(mbi->flags, 1))
-    printf("boot_device = 0x%x\n", (unsigned) mbi->boot_device);
-  if(CHECK_FLAG(mbi->flags, 2)) 
-    printf("cmdline = %s\n", (char *) mbi->cmdline);
-  if(CHECK_FLAG(mbi->flags, 3)) {
-    module_t *mod;
-    int i;
-    printf("mods_count = %d, mods_addr = 0x%x\n", (int) mbi->mods_count, (int) mbi->mods_addr);
-    for(i=0, mod = (module_t *) mbi->mods_addr; i< mbi->mods_count; i++, mod += sizeof(module_t)) 
-      printf("mod_start = 0x%x, mod_end = 0x%x, string = %s\n", (unsigned) mod->mod_start, (unsigned) mod->mod_end, (char *) mod->string);
-  }
-  if(CHECK_FLAG(mbi->flags, 4) && CHECK_FLAG(mbi->flags, 5)) {
-    printf("Both bits 4 and 5 are set.\n");
-    return;
-  }
-  if(CHECK_FLAG(mbi->flags, 4)) {
-    aout_symbol_table_t *aout_sym = &(mbi->u.aout_sym);
-    printf("aout_symbol_table: tabsize = 0x%0x, strsize = 0x%x, addr = 0x%x\n", (unsigned) aout_sym->tabsize, (unsigned) aout_sym->strsize, (unsigned) aout_sym->addr);
-  }
-  if(CHECK_FLAG(mbi->flags, 5)) {
-    elf_section_header_table_t *elf_sec = &(mbi->u.elf_sec);
-    printf("elf_sec: num = %u, size = 0x%x, addr = 0x%x, shndx = 0x%x\n", (unsigned) elf_sec->num, (unsigned) elf_sec->size, (unsigned) elf_sec->addr, (unsigned elf_sec->shndx));
-  }
-  if(CHECK_FLAG(mbi->flags, 6)) {
-    memory_map_t *mmap;
-    printf("mmap_addr = 0x%x, mmap_length = 0x%x\n", (unsigned) mbi->mmap_addr, (unsigned) mbi->mmap_length);
-    for(mmap = (memory_map_t *) mbi->mmap_addr; (unsigned long) mmap < mbi->mmap addr + mbi->mmap_length; mmap = (memory_map_t *) ((unsigned long) mmap + mmap->size +sizeof(mmap->size))) 
-      printf("size = 0x%x, base_addr = 0x%x%x, length = 0x%x%x, type = 0x%x\n", (unsigned) mmap->size, (unsigned) mmap->base_addr_high, (unsigned) mmap->base_addr_low, (unsigned) mmap->length_high, (unsigned) mmap->length_low, (unsigned) mmap->type);
-  }
-}
-*/}
+struct multiboot_mod_list
+{
+  multiboot_uint32_t mod_start;
+  multiboot_uint32_t mod_end;
+  multiboot_uint32_t cmdline;
+  multiboot_uint32_t pad;
+};
+typedef struct multiboot_mod_list multiboot_module_t;
+
+struct multiboot_apm_info
+{
+  multiboot_uint16_t version;
+  multiboot_uint16_t cseg;
+  multiboot_uint32_t offset;
+  multiboot_uint16_t cseg_16;
+  multiboot_uint16_t dseg;
+  multiboot_uint16_t flags;
+  multiboot_uint16_t cseg_len;
+  multiboot_uint16_t cseg_16_len;
+  multiboot_uint16_t dseg_len;
+};
+
+#endif 
+
+#endif 
