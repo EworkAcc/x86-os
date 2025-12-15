@@ -5,7 +5,7 @@
 #include "memory/SEG/seg.h"
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
-#include "drivers/INTTERUPTS/kb.h"
+#include "drivers/INTERRUPTS/kb.h"
 
 int kmain(unsigned int ebx) {
   segments_install_gdt();

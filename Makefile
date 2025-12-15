@@ -1,4 +1,4 @@
-OBJECTS = loader.o io.o gdt.o idt.o interrupt_handler.o kmain.o fb_driver.o seg_driver.o sp_driver.o interrupt_driver.o pic_driver.o kb_driver.o
+OBJECTS = loader.o drivers/IO/io.o memory/SEG/gdt.o drivers/INTERRUPTS/idt.o drivers/INTERRUPTS/interrupt_handler.o kmain.o drivers/FB/fb_driver.o memory/SEG/seg_driver.o drivers/SP/sp_driver.o drivers/INTERRUPTS/interrupt_driver.o drivers/INTERRUPTS/pic_driver.o drivers/INTERRUPTS/kb_driver.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -34,6 +34,8 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso
+	rm -rf *.o kernel.elf os.iso bochslog.txt
 	rm -rf iso/boot/kernel.elf
 	rm -rf iso/modules/*.o
+	rm -rf drivers/*/*.o
+	rm -rf memory/*/*.o
