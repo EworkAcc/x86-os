@@ -1,11 +1,11 @@
 #include "multiboot.h"
-#include "io.h"
-#include "sp.h"
-#include "fb.h"
-#include "seg.h"
-#include "pic.h"
-#include "interrupt.h"
-#include "kb.h"
+#include "drivers/IO/io.h"
+#include "drivers/SP/sp.h"
+#include "drivers/FB/fb.h"
+#include "memory/SEG/seg.h"
+#include "drivers/INTERRUPTS/pic.h"
+#include "drivers/INTERRUPTS/interrupt.h"
+#include "drivers/INTTERUPTS/kb.h"
 
 int kmain(unsigned int ebx) {
   segments_install_gdt();

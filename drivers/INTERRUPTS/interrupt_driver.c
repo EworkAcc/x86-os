@@ -1,8 +1,8 @@
-#include "io.h"
+#include "../IO/io.h"
 #include "interrupt.h"
 #include "pic.h"
-
-#include "sp.h"
+#include "../FB/fb.h"
+#include "../SP/sp.h"
 #include "kb.h"
 
 #define INTERRUPTS_DESCRIPTOR_COUNT 256
