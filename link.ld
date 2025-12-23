@@ -1,26 +1,32 @@
 ENTRY(loader)
 
+/*for true kernel physical kernel should go from 0x00100000 -> 0x00100000 + kernel_size*/
+/*for true kernel virtual kernel should go from 0xc0100000 -> 0xc0100000 + kernel_size*/
 SECTIONS {
-  . = 0x00100000;
+    . = 0x00100000;
 
-  .text ALIGN (0x1000) :
-  {
-    *(.text)
-  }
+    KERNEL_PHYSICAL_START = . - 0x00100000; 
 
-  .rodata ALIGN (0x1000) :
-  {
-    *(.rodata*)
-  }
+    .text ALIGN(0x1000) :
+    {
+        *(.text*)
+    }
 
-  .data ALIGN (0x1000) :
-  {
-    *(.data)
-  }
+    .rodata ALIGN(0x1000) :
+    {
+        *(.rodata*)
+    }
 
-  .bss ALIGN (0x1000) :
-  {
-    *(COMMON)
-    *(.bss)
-  }
+    .data ALIGN(0x1000) :
+    {
+        *(.data*)
+    }
+
+    .bss ALIGN(0x1000) :
+    {
+        *(COMMON)
+        *(.bss*)
+    }
+
+    KERNEL_PHYSICAL_END = .;
 }

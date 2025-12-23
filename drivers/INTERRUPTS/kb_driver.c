@@ -1,4 +1,4 @@
-#include "io.h"
+#include "../IO/io.h"
 #include "kb.h"
 
 unsigned char keyboard_read_scan_code(void) {

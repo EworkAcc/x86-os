@@ -4,6 +4,8 @@
 #define SERIAL_COM1_BASE 0x3f8
 #define SERIAL_LINE_ENABLE_DLAB 0x80
 
+enum BaudRate { Baud_115200=1, Baud_57600, Baud_19200, Baud_9600 };
+
 #define SERIAL_DATA_PORT(base) (base)
 #define SERIAL_FIFO_COMMAND_PORT(base) (base + 2)
 #define SERIAL_LINE_COMMAND_PORT(base) (base + 3)

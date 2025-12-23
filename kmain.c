@@ -1,16 +1,19 @@
 #include "multiboot.h"
-#include "io.h"
-#include "sp.h"
-#include "fb.h"
-#include "seg.h"
-#include "pic.h"
-#include "interrupt.h"
-#include "kb.h"
+#include "drivers/IO/io.h"
+#include "drivers/SP/sp.h"
+#include "drivers/FB/fb.h"
+#include "drivers/INTERRUPTS/pic.h"
+#include "drivers/INTERRUPTS/interrupt.h"
+#include "drivers/INTERRUPTS/kb.h"
+#include "memory/PAGING/paging.h"
+#include "memory/SEG/seg.h"
 
 int kmain(unsigned int ebx) {
   segments_install_gdt();
 
   interrupts_install_idt();
+
+  init_paging();
 
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;
