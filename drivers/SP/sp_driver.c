@@ -1,9 +1,6 @@
 #include "../IO/io.h"
 #include "sp.h"
 
-enum BaudRate { Baud_115200=1, Baud_57600, Baud_19200, Baud_9600 };
-enum BaudRate divisor = Baud_115200;
-
 /*SERIAL PORT DRIVER*/
 void serial_configure_baud_rate(unsigned short com, unsigned short divisor) {
   outb(SERIAL_LINE_COMMAND_PORT(com), SERIAL_LINE_ENABLE_DLAB);

@@ -38,5 +38,6 @@ void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stac
 
 void load_idt(unsigned int idt_address);
 void interrupt_handler_33(void);
+void interrupt_handler_14(void);
 
 #endif

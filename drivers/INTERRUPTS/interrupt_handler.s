@@ -50,3 +50,4 @@ no_error_code_interrupt_handler 6
 error_code_interrupt_handler 7
 
 no_error_code_interrupt_handler 33
+no_error_code_interrupt_handler 14
