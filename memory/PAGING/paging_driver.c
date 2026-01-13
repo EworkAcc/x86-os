@@ -14,10 +14,12 @@ void init_paging() {
   }
 
   for(i = 0; i < NUM_PAGES; i++) {
-    page_table[i] = (i * 0x1000) | 3;
+    page_table[i] = (i * 0x1000) | 7;
   }
 
-  page_directory[0] = ((unsigned int)page_table) | 3;
+  for(i = 0; i < 4; ++i) {
+    page_directory[i] = ((unsigned int)page_table + (i * 0x1000)) | 3;
+  }
   enable_paging(page_directory);
 }
 

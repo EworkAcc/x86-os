@@ -11,7 +11,6 @@ interrupt_handler_%1:
 %macro error_code_interrupt_handler 1
 global interrupt_handler_%1
 interrupt_handler_%1:
-  push dword 0
   push dword %1
   jmp common_interrupt_handler
 %endmacro
@@ -48,6 +47,6 @@ no_error_code_interrupt_handler 4
 no_error_code_interrupt_handler 5
 no_error_code_interrupt_handler 6
 error_code_interrupt_handler 7
+error_code_interrupt_handler 14
 
 no_error_code_interrupt_handler 33
-no_error_code_interrupt_handler 14

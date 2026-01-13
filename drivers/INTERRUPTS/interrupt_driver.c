@@ -24,6 +24,7 @@ void interrupts_init_descriptor(int index, unsigned int address) {
 }
 
 void interrupts_install_idt() {
+  interrupts_init_descriptor(INTERRUPTS_PAGING,(unsigned int) interrupt_handler_14);
   interrupts_init_descriptor(INTERRUPTS_KEYBOARD, (unsigned int) interrupt_handler_33);
 
   idt.address = (int) &idt_descriptors;

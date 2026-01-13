@@ -28,6 +28,8 @@ void segments_install_gdt() {
 
   segments_init_descriptor(1, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_CODE_TYPE, SEGMENT_FLAGS_PART);
   segments_init_descriptor(2, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_DATA_TYPE, SEGMENT_FLAGS_PART);
+  segments_init_descriptor(3, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_USER_CODE_TYPE, SEGMENT_FLAGS_PART);
+  segments_init_descriptor(4, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_USER_DATA_TYPE, SEGMENT_FLAGS_PART);
   
   segments_load_gdt(*gdt_ptr);
   segments_load_registers();

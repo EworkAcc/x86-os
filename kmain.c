@@ -8,6 +8,8 @@
 #include "memory/PAGING/paging.h"
 #include "memory/SEG/seg.h"
 
+extern void enter_user_mode(unsigned int entry_point);
+
 int kmain(unsigned int ebx) {
   segments_install_gdt();
 
@@ -18,7 +20,10 @@ int kmain(unsigned int ebx) {
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;
   unsigned int address_of_module = modules->mod_start;
+  // unsigned int size = modules->mod_end - modules->mod_start;
 
+  enter_user_mode(address_of_module);
+  /*
   if((mbinfo->mods_count) == 1) {
     char message[] = "ONE module loaded successfully!";
     serial_write(message, sizeof(message));
@@ -34,13 +39,6 @@ int kmain(unsigned int ebx) {
     char message[] = "Error: More than ONE module loaded";
     serial_write(message, sizeof(message));
   }
-  /*
-  unsigned char scancode, ascii;
-  char asciicode[4000];
-  scancode = keyboard_read_scan_code();
-  ascii = keyboard_scan_code_to_ascii(scancode);
-  asciicode[0] = ascii;
-  serial_write((char *)asciicode, sizeof(asciicode));
-  */ 
+  */
   return 0;
 }
