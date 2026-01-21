@@ -25,7 +25,7 @@ os.iso: kernel.elf
 		iso
 
 run: os.iso
-	bochs -f bochsrc.txt -q
+	bochs -q -f bochsrc.txt
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -34,7 +34,7 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso bochslog.txt co1.out
+	rm -rf *.o *.ini kernel.elf os.iso bochslog.txt co1.out
 	rm -rf iso/boot/kernel.elf
 	rm -rf drivers/*/*.o
 	rm -rf memory/*/*.o
