@@ -1,8 +1,14 @@
 global segments_load_gdt
 global segments_load_registers
+global tss_load
 
 segments_load_gdt:
   lgdt [esp + 4]
+  ret
+
+tss_load:
+  mov ax, 0x28
+  ltr ax
   ret
 
 segments_load_registers:

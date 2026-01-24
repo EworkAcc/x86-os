@@ -17,13 +17,13 @@ struct IDTDescriptor {
 } __attribute__((packed));
 
 struct cpu_state {
-  unsigned int eax;
-  unsigned int ebx;
-  unsigned int ecx;
-  unsigned int edx;
   unsigned int ebp;
   unsigned int esi;
   unsigned int edi;
+  unsigned int edx;
+  unsigned int ecx;
+  unsigned int ebx;
+  unsigned int eax;
 } __attribute__((packed));
 
 struct stack_state {

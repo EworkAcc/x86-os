@@ -122,7 +122,7 @@ void interrupts_install_idt() {
   interrupts_init_descriptor(INTERRUPTS_KEYBOARD, (unsigned int) interrupt_handler_33);
 
   idt.address = (int) &idt_descriptors;
-  idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT;
+  idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT - 1;
   
   load_idt((int) &idt);
 
@@ -159,7 +159,10 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
   serial_write("cpu exception", 13);
 
   if(interrupt < 33) {
-    serial_write((char*)interrupt_names[interrupt], sizeof(interrupt_names[interrupt]));
+    const char *name = interrupt_names[interrupt];
+    int len = 0;
+    while(name[len]) len++;
+    serial_write((char*)name, len);
   }
 
   serial_write("\nINT: 0x", 8);

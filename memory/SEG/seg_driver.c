@@ -1,4 +1,5 @@
 #include "seg.h"
+#include "tss.h"
 
 static struct GDTDescriptor gdt_descriptors[SEGMENT_DESCRIPTOR_COUNT];
 
@@ -22,15 +23,18 @@ void segments_install_gdt() {
   gdt_descriptors[0].access_byte = 0;
   gdt_descriptors[0].limit_and_flags = 0;
 
-  struct GDT* gdt_ptr = (struct GDT*)gdt_descriptors;
-  gdt_ptr->address = (unsigned int)gdt_descriptors;
-  gdt_ptr->size = (sizeof(struct GDTDescriptor) * SEGMENT_DESCRIPTOR_COUNT) - 1;
+  struct GDT gdt;
+  gdt.address = (unsigned int)gdt_descriptors;
+  gdt.size = (sizeof(struct GDTDescriptor) * SEGMENT_DESCRIPTOR_COUNT) - 1;
 
   segments_init_descriptor(1, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_CODE_TYPE, SEGMENT_FLAGS_PART);
   segments_init_descriptor(2, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_DATA_TYPE, SEGMENT_FLAGS_PART);
   segments_init_descriptor(3, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_USER_CODE_TYPE, SEGMENT_FLAGS_PART);
   segments_init_descriptor(4, SEGMENT_BASE, SEGMENT_LIMIT, SEGMENT_USER_DATA_TYPE, SEGMENT_FLAGS_PART);
+
+  tss_init();
   
-  segments_load_gdt(*gdt_ptr);
+  segments_load_gdt(gdt);
   segments_load_registers();
+  tss_load();
 }
