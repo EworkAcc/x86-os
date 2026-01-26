@@ -12,8 +12,13 @@ enter_user_mode:
   mov gs, dx
 
   push 0x23
-  push 0x800000
+  push 0x3fffff
+
   pushf
+  pop ebx
+  or ebx, 0x200
+  push ebx
+
   push 0x1b
   push eax
 

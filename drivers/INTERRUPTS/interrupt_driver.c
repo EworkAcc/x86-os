@@ -6,7 +6,7 @@
 #include "../SP/sp.h"
 #include "../../memory/PAGING/paging.h"
 
-static const char *interrupt_names[33] = {
+static const char *interrupt_names[32] = {
   "#DE divide error",
   "#DB debug exception",
   "NMI interrupt",
@@ -33,7 +33,7 @@ static const char *interrupt_names[33] = {
   "#HV hypervisor injection",
   "#VC VMM communication",
   "#SX security exception",
-  "31 reserved", "32 reserved"
+  "31 reserved"
 };
 
 #define INTERRUPTS_DESCRIPTOR_COUNT 256
@@ -76,7 +76,7 @@ void interrupts_init_descriptor(int index, unsigned int address) {
   idt_descriptors[index].segment_selector = 0x08;
   idt_descriptors[index].reserved = 0x00;
 
-  idt_descriptors[index].type_and_attr = (0x01 << 7) | (0x00 << 6) | (0x00 << 5) | 0xe;
+  idt_descriptors[index].type_and_attr = (0x01 << 7) | (0x03 << 5) | 0xe;
 }
 
 void interrupts_install_idt() {
@@ -124,7 +124,7 @@ void interrupts_install_idt() {
   idt.address = (int) &idt_descriptors;
   idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT - 1;
   
-  load_idt((int) &idt);
+  load_idt((unsigned int) &idt);
 
   pic_remap(PIC_1_OFFSET, PIC_2_OFFSET);
 }
@@ -140,7 +140,7 @@ static void serial_write_hex(unsigned int value) {
   serial_write(hex, 8);
 }
 
-void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state stack) {
+void interrupt_handler(__attribute__((unused)) struct cpu_state *cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state *stack) {
   if(interrupt == INTERRUPTS_KEYBOARD) {
     unsigned char scan_code = keyboard_read_scan_code();
     if(scan_code <= KEYBOARD_MAX_ASCII) {
@@ -158,7 +158,7 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
 
   serial_write("cpu exception", 13);
 
-  if(interrupt < 33) {
+  if(interrupt < 32) {
     const char *name = interrupt_names[interrupt];
     int len = 0;
     while(name[len]) len++;
@@ -169,24 +169,37 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
   serial_write_hex(interrupt);
   
   serial_write("\nEIP: 0x", 9);
-  serial_write_hex(stack.eip);
+  serial_write_hex(stack->eip);
 
   serial_write("\nCS: 0x", 9);
-  serial_write_hex(stack.cs);
+  serial_write_hex(stack->cs);
 
   serial_write("\nEFLAGS: 0x", 12);
-  serial_write_hex(stack.eflags);
+  serial_write_hex(stack->eflags);
 
   serial_write("\nERROR CODE: 0x", 16);
-  serial_write_hex(stack.error_code);
+  serial_write_hex(stack->error_code);
 
-  serial_write("\nEAX: 0x", 9); serial_write_hex(cpu.eax);
-  serial_write("\nEBX: 0x", 9); serial_write_hex(cpu.ebx);
-  serial_write("\nECX: 0x", 9); serial_write_hex(cpu.ecx);
-  serial_write("\nEDX: 0x", 9); serial_write_hex(cpu.edx);
-  serial_write("\nEBP: 0x", 9); serial_write_hex(cpu.ebp);
-  serial_write("\nESI: 0x", 9); serial_write_hex(cpu.esi);
-  serial_write("\nEDI: 0x", 9); serial_write_hex(cpu.edi);
+  serial_write("\nEAX: 0x", 9); 
+  serial_write_hex(cpu->eax);
+
+  serial_write("\nEBX: 0x", 9); 
+  serial_write_hex(cpu->ebx);
+
+  serial_write("\nECX: 0x", 9); 
+  serial_write_hex(cpu->ecx);
+
+  serial_write("\nEDX: 0x", 9); 
+  serial_write_hex(cpu->edx);
+
+  serial_write("\nEBP: 0x", 9); 
+  serial_write_hex(cpu->ebp);
+
+  serial_write("\nESI: 0x", 9); 
+  serial_write_hex(cpu->esi);
+
+  serial_write("\nEDI: 0x", 9); 
+  serial_write_hex(cpu->edi);
 
   serial_write("\nSYSTEM HALTED\n", 16);
 

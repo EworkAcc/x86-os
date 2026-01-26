@@ -17,9 +17,9 @@ struct IDTDescriptor {
 } __attribute__((packed));
 
 struct cpu_state {
-  unsigned int ebp;
-  unsigned int esi;
   unsigned int edi;
+  unsigned int esi;
+  unsigned int ebp;
   unsigned int edx;
   unsigned int ecx;
   unsigned int ebx;
@@ -34,7 +34,7 @@ struct stack_state {
 } __attribute__((packed));
 
 void interrupts_install_idt();
-void interrupt_handler(struct cpu_state cpu, unsigned int interrupt, struct stack_state stack);
+void interrupt_handler(struct cpu_state *cpu, unsigned int interrupt, struct stack_state *stack);
 
 void load_idt(unsigned int idt_address);
 

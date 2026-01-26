@@ -3,7 +3,8 @@ global segments_load_registers
 global tss_load
 
 segments_load_gdt:
-  lgdt [esp + 4]
+  mov eax, [esp + 4]
+  lgdt [eax]
   ret
 
 tss_load:

@@ -34,7 +34,7 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o *.ini kernel.elf os.iso bochslog.txt co1.out
+	rm -rf *.o *.ini kernel.elf os.iso bochslog.txt com1.out
 	rm -rf iso/boot/kernel.elf
 	rm -rf drivers/*/*.o
 	rm -rf memory/*/*.o
