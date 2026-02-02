@@ -1,4 +1,4 @@
-OBJECTS = loader.o drivers/IO/io.o memory/SEG/gdt.o drivers/INTERRUPTS/idt.o drivers/INTERRUPTS/interrupt_handler.o kmain.o drivers/FB/fb_driver.o memory/SEG/seg_driver.o drivers/SP/sp_driver.o drivers/INTERRUPTS/interrupt_driver.o drivers/INTERRUPTS/pic_driver.o drivers/INTERRUPTS/kb_driver.o memory/PAGING/common_driver.o memory/PAGING/ep.o memory/PAGING/kheap_driver.o memory/PAGING/paging_driver.o
+OBJECTS = loader.o drivers/IO/io.o memory/SEG/gdt.o drivers/INTERRUPTS/idt.o drivers/INTERRUPTS/interrupt_handler.o kmain.o drivers/FB/fb_driver.o memory/SEG/seg_driver.o memory/SEG/tss_driver.o drivers/SP/sp_driver.o drivers/INTERRUPTS/interrupt_driver.o drivers/INTERRUPTS/pic_driver.o drivers/INTERRUPTS/kb_driver.o memory/PAGING/common_driver.o memory/PAGING/ep.o memory/PAGING/kheap_driver.o memory/PAGING/paging_driver.o um.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 	-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -25,7 +25,7 @@ os.iso: kernel.elf
 		iso
 
 run: os.iso
-	bochs -f bochsrc.txt -q
+	bochs -q -f bochsrc.txt
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -34,8 +34,9 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso bochslog.txt co1.out
+	rm -rf *.o *.ini kernel.elf os.iso bochslog.txt com1.out
 	rm -rf iso/boot/kernel.elf
-	rm -rf iso/modules/*.o
 	rm -rf drivers/*/*.o
 	rm -rf memory/*/*.o
+	rm -rf iso/modules/*.o
+	rm -rf user/*.o

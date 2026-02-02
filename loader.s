@@ -1,3 +1,4 @@
+global kernel_stack
 global loader
   MAGIC_NUMBER equ 0x1badb002
   ALIGN_MODULES equ 0x00000001

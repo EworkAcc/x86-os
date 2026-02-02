@@ -1,13 +1,18 @@
 #ifndef INCLUDE_SEG_H
 #define INCLUDE_SEG_H
 
-#define SEGMENT_DESCRIPTOR_COUNT 3
+#define SEGMENT_DESCRIPTOR_COUNT 6
 
 #define SEGMENT_BASE 0
 #define SEGMENT_LIMIT 0xfffff
 
 #define SEGMENT_CODE_TYPE 0x9a
 #define SEGMENT_DATA_TYPE 0x92
+
+#define SEGMENT_USER_CODE_TYPE 0xfa
+#define SEGMENT_USER_DATA_TYPE 0xf2
+
+#define SEGMENT_TSS_TYPE 0x89
 
 #define SEGMENT_FLAGS_PART 0x0c
 
@@ -28,7 +33,7 @@ struct GDTDescriptor {
 void segments_init_descriptor(int index, unsigned int base_address, unsigned int limit, unsigned char access_byte, unsigned char flags);
 void segments_install_gdt();
 
-void segments_load_gdt(struct GDT gdt);
+void segments_load_gdt(struct GDT *gdt);
 void segments_load_registers();
 
 #endif
