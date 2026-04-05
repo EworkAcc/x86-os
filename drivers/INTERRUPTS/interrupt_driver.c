@@ -1,6 +1,7 @@
 #include "interrupt.h"
 #include "pic.h"
 #include "kb.h"
+#include "../SYSCALLS/syscalls.h"
 #include "../IO/io.h"
 #include "../FB/fb.h"
 #include "../SP/sp.h"
@@ -65,6 +66,7 @@ static const char *interrupt_names[32] = {
 #define INTERRUPTS_SX 30
 
 #define INTERRUPTS_KEYBOARD 33
+#define INTERRUPTS_SYSCALL 128
 
 struct IDTDescriptor idt_descriptors[INTERRUPTS_DESCRIPTOR_COUNT];
 struct IDT idt;
@@ -120,6 +122,7 @@ void interrupts_install_idt() {
   interrupts_init_descriptor(32, (unsigned int) interrupt_handler_32);
 
   interrupts_init_descriptor(INTERRUPTS_KEYBOARD, (unsigned int) interrupt_handler_33);
+  interrupts_init_descriptor(INTERRUPTS_SYSCALL, (unsigned int) interrupt_handler_128);
 
   idt.address = (int) &idt_descriptors;
   idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT - 1;
@@ -129,7 +132,7 @@ void interrupts_install_idt() {
   pic_remap(PIC_1_OFFSET, PIC_2_OFFSET);
 }
 
-static void serial_write_hex(unsigned int value) {
+void serial_write_hex(unsigned int value) {
   char hex[9];
   const char *digits = "0123456789abcdef";
   for(int i = 7; i >= 0; --i) {
@@ -141,6 +144,11 @@ static void serial_write_hex(unsigned int value) {
 }
 
 void interrupt_handler(__attribute__((unused)) struct cpu_state *cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state *stack) {
+  if(interrupt == INTERRUPTS_SYSCALL) {
+    cpu->eax = (unsigned int)syscall_entry(cpu);
+    return;
+  }
+
   if(interrupt == INTERRUPTS_KEYBOARD) {
     unsigned char scan_code = keyboard_read_scan_code();
     if(scan_code <= KEYBOARD_MAX_ASCII) {

@@ -25,7 +25,17 @@ common_interrupt_handler:
   push esi
   push edi
 
+  mov eax, esp
+  mov ebx, [esp + 28]
+  lea ecx, [esp + 32]
+
+  push ecx
+  push ebx
+  push eax
+
   call interrupt_handler
+
+  add esp, 12
 
   pop edi
   pop esi
@@ -81,3 +91,4 @@ no_error_code_interrupt_handler 31
 no_error_code_interrupt_handler 32
 
 no_error_code_interrupt_handler 33
+no_error_code_interrupt_handler 128

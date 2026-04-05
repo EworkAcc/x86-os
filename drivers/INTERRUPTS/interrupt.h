@@ -7,13 +7,11 @@ struct IDT {
 } __attribute__((packed));
 
 struct IDTDescriptor {
-  /*bot 32 bits*/
-  unsigned short offset_low; //bit 0-15
+  unsigned short offset_low;
   unsigned short segment_selector;
-  /*top 32 bits*/
   unsigned char reserved;
   unsigned char type_and_attr;
-  unsigned short offset_high; //bit 16-31
+  unsigned short offset_high;
 } __attribute__((packed));
 
 struct cpu_state {
@@ -78,5 +76,8 @@ void interrupt_handler_31(void);
 void interrupt_handler_32(void);
 
 void interrupt_handler_33(void);
+void interrupt_handler_128(void);
+
+void serial_write_hex(unsigned int value);
 
 #endif
