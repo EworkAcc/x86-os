@@ -4,6 +4,7 @@
 #include "../IO/io.h"
 #include "../FB/fb.h"
 #include "../SP/sp.h"
+#include "../SYSCALLS/syscalls.h"
 #include "../../memory/PAGING/paging.h"
 
 static const char *interrupt_names[32] = {
@@ -120,6 +121,7 @@ void interrupts_install_idt() {
   interrupts_init_descriptor(32, (unsigned int) interrupt_handler_32);
 
   interrupts_init_descriptor(INTERRUPTS_KEYBOARD, (unsigned int) interrupt_handler_33);
+  interrupts_init_descriptor(SYSCALL_INTERRUPT_VECTOR, (unsigned int) interrupt_handler_128);
 
   idt.address = (int) &idt_descriptors;
   idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT - 1;
@@ -141,6 +143,11 @@ static void serial_write_hex(unsigned int value) {
 }
 
 void interrupt_handler(__attribute__((unused)) struct cpu_state *cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state *stack) {
+  if(interrupt == SYSCALL_INTERRUPT_VECTOR) {
+    cpu->eax = (unsigned int)syscall_dispatch(cpu);
+    return;
+  }
+
   if(interrupt == INTERRUPTS_KEYBOARD) {
     unsigned char scan_code = keyboard_read_scan_code();
     if(scan_code <= KEYBOARD_MAX_ASCII) {

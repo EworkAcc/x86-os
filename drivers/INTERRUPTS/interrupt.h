@@ -78,5 +78,6 @@ void interrupt_handler_31(void);
 void interrupt_handler_32(void);
 
 void interrupt_handler_33(void);
+void interrupt_handler_128(void);
 
 #endif
