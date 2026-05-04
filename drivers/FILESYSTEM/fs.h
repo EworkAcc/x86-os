@@ -44,5 +44,6 @@ int vfs_node_from_path(const char *path);
 int vfs_is_file(int node);
 int vfs_read_node(int node, unsigned int offset, unsigned char *buffer, unsigned int size);
 int vfs_write_node(int node, unsigned int offset, const unsigned char *buffer, unsigned int size);
+unsigned int vfs_node_size(int node);
 
 #endif

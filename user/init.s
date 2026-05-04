@@ -37,6 +37,13 @@ load_base:
   int 0x80
   mov ebp, eax
 
+
+  mov eax, 19
+  mov ebx, ebp
+  mov ecx, 0
+  mov edx, 0
+  int 0x80
+
   mov eax, 3
   mov ebx, ebp
   lea ecx, [edi + file_buffer - load_base]

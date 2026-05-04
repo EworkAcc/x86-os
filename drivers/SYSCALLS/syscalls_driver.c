@@ -6,6 +6,9 @@
 #define USER_MEMORY_LIMIT 0x00400000
 #define MAX_OPEN_FILES 16
 #define O_CREAT 0x40
+#define SEEK_SET 0
+#define SEEK_CUR 1
+#define SEEK_END 2
 
 typedef int (*syscall_handler_t)(struct cpu_state *cpu);
 struct syscall_entry { unsigned int number; syscall_handler_t handler; };
@@ -110,6 +113,34 @@ static int syscall_close(struct cpu_state *cpu) {
   return 0;
 }
 
+
+static int syscall_lseek(struct cpu_state *cpu) {
+  int fd = (int)cpu->ebx;
+  int offset = (int)cpu->ecx;
+  unsigned int whence = cpu->edx;
+  unsigned int base;
+  unsigned int size;
+
+  if(!fd_is_open(fd)) return -1;
+
+  size = vfs_node_size(open_files[fd].node);
+
+  if(whence == SEEK_SET) {
+    if(offset < 0) return -1;
+    base = 0;
+  } else if(whence == SEEK_CUR) {
+    base = open_files[fd].offset;
+  } else if(whence == SEEK_END) {
+    base = size;
+  } else {
+    return -1;
+  }
+
+  if(offset < 0 && (unsigned int)(-offset) > base) return -1;
+  open_files[fd].offset = (unsigned int)((int)base + offset);
+  return (int)open_files[fd].offset;
+}
+
 static int syscall_getpid(__attribute__((unused)) struct cpu_state *cpu) { return 1; }
 static int syscall_fs_create(struct cpu_state *cpu) { char path[FS_MAX_NAME_LEN]; if(copy_user_string(cpu->ebx, cpu->ecx, path, FS_MAX_NAME_LEN) < 0) return -1; return vfs_create_file(path); }
 static int syscall_fs_write(struct cpu_state *cpu) { char path[FS_MAX_NAME_LEN]; if(copy_user_string(cpu->ebx, cpu->ecx, path, FS_MAX_NAME_LEN) < 0) return -1; if(!user_buffer_is_valid(cpu->edx, cpu->esi)) return -1; return vfs_write_file(path, (const unsigned char *)cpu->edx, cpu->esi); }
@@ -134,7 +165,7 @@ static int syscall_fs_list(struct cpu_state *cpu) {
 }
 
 static struct syscall_entry syscall_table[] = {
-  {SYSCALL_EXIT, syscall_exit}, {SYSCALL_READ, syscall_read}, {SYSCALL_WRITE, syscall_write}, {SYSCALL_OPEN, syscall_open}, {SYSCALL_CLOSE, syscall_close},
+  {SYSCALL_EXIT, syscall_exit}, {SYSCALL_READ, syscall_read}, {SYSCALL_WRITE, syscall_write}, {SYSCALL_OPEN, syscall_open}, {SYSCALL_CLOSE, syscall_close}, {SYSCALL_LSEEK, syscall_lseek},
   {SYSCALL_GETPID, syscall_getpid}, {SYSCALL_FS_CREATE, syscall_fs_create}, {SYSCALL_FS_WRITE, syscall_fs_write}, {SYSCALL_FS_READ, syscall_fs_read},
   {SYSCALL_FS_MKDIR, syscall_fs_mkdir}, {SYSCALL_FS_LIST, syscall_fs_list}
 };

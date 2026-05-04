@@ -96,3 +96,8 @@ int vfs_list(const char *path, struct fs_dir_entry *entries, unsigned int max_en
   for(i=0;i<FS_MAX_NODES && count<max_entries;i++) { if(!fs_nodes[i].used||fs_nodes[i].parent!=node||i==node) continue; for(j=0;j<FS_MAX_NAME_LEN;j++){ entries[count].name[j]=fs_nodes[i].name[j]; if(fs_nodes[i].name[j]==0) break;} if(j==FS_MAX_NAME_LEN) entries[count].name[FS_MAX_NAME_LEN-1]=0; entries[count].type=fs_nodes[i].type; count++; }
   return (int)count;
 }
+
+unsigned int vfs_node_size(int node) {
+  if(!vfs_is_file(node)) return 0;
+  return fs_nodes[node].size;
+}
