@@ -10,21 +10,54 @@ load_base:
   mov ecx, dir_path_len
   int 0x80
 
-  mov eax, 4
-  lea ebx, [edi + header - load_base]
-  mov ecx, header_len
+  mov eax, 450
+  lea ebx, [edi + file_path - load_base]
+  mov ecx, file_path_len
   int 0x80
 
-  mov eax, 454
-  lea ebx, [edi + root_path - load_base]
-  mov ecx, root_path_len
-  lea edx, [edi + list_buffer - load_base]
-  mov esi, list_buffer_len
+  mov eax, 5
+  lea ebx, [edi + file_cstr - load_base]
+  mov ecx, 0
+  int 0x80
+  mov ebp, eax
+
+  mov eax, 4
+  mov ebx, ebp
+  lea ecx, [edi + file_data - load_base]
+  mov edx, file_data_len
+  int 0x80
+
+  mov eax, 6
+  mov ebx, ebp
+  int 0x80
+
+  mov eax, 5
+  lea ebx, [edi + file_cstr - load_base]
+  mov ecx, 0
+  int 0x80
+  mov ebp, eax
+
+  mov eax, 3
+  mov ebx, ebp
+  lea ecx, [edi + file_buffer - load_base]
+  mov edx, file_buffer_len
+  int 0x80
+  mov esi, eax
+
+  mov eax, 4
+  mov ebx, 1
+  lea ecx, [edi + header - load_base]
+  mov edx, header_len
   int 0x80
 
   mov eax, 4
-  lea ebx, [edi + list_buffer - load_base]
-  mov ecx, eax
+  mov ebx, 1
+  lea ecx, [edi + file_buffer - load_base]
+  mov edx, esi
+  int 0x80
+
+  mov eax, 6
+  mov ebx, ebp
   int 0x80
 
   mov eax, 1
@@ -33,17 +66,24 @@ load_base:
   jmp $
 
 header:
-  db "root directory entries:", 10
+  db "fd readback:", 10
 header_len equ $ - header
 
 dir_path:
   db "/tmp"
 dir_path_len equ $ - dir_path
 
-root_path:
-  db "/"
-root_path_len equ $ - root_path
+file_path:
+  db "/tmp/a"
+file_path_len equ $ - file_path
 
-list_buffer:
+file_cstr:
+  db "/tmp/a", 0
+
+file_data:
+  db "hello layered fs", 10
+file_data_len equ $ - file_data
+
+file_buffer:
   times 128 db 0
-list_buffer_len equ $ - list_buffer
+file_buffer_len equ $ - file_buffer

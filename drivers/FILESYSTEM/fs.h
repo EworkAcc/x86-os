@@ -40,4 +40,9 @@ int vfs_write_file(const char *path, const unsigned char *buffer, unsigned int s
 int vfs_read_file(const char *path, unsigned char *buffer, unsigned int size);
 int vfs_list(const char *path, struct fs_dir_entry *entries, unsigned int max_entries);
 
+int vfs_node_from_path(const char *path);
+int vfs_is_file(int node);
+int vfs_read_node(int node, unsigned int offset, unsigned char *buffer, unsigned int size);
+int vfs_write_node(int node, unsigned int offset, const unsigned char *buffer, unsigned int size);
+
 #endif
