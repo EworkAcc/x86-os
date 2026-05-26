@@ -5,6 +5,7 @@
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
 #include "drivers/INTERRUPTS/kb.h"
+#include "drivers/FILESYSTEM/fs.h"
 #include "memory/PAGING/paging.h"
 #include "memory/SEG/seg.h"
 
@@ -16,6 +17,7 @@ int kmain(unsigned int ebx) {
   interrupts_install_idt();
 
   init_paging();
+  filesystem_init();
 
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;
