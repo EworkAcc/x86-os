@@ -2,9 +2,12 @@
 #include "drivers/IO/io.h"
 #include "drivers/SP/sp.h"
 #include "drivers/FB/fb.h"
+#include "drivers/DISPLAY/display.h"
+#include "drivers/LOG/klog.h"
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
 #include "drivers/INTERRUPTS/kb.h"
+#include "drivers/FILESYSTEM/fs.h"
 #include "memory/PAGING/paging.h"
 #include "memory/SEG/seg.h"
 
@@ -16,6 +19,13 @@ int kmain(unsigned int ebx) {
   interrupts_install_idt();
 
   init_paging();
+
+  display_init();
+  klog_init(KLOG_SINK_BOTH);
+  klog_write_string("x86-os display initialized\n");
+
+  filesystem_init();
+  klog_write_string("filesystem initialized\n");
 
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;
