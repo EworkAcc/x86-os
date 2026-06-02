@@ -5,6 +5,7 @@
 #include "drivers/DISPLAY/display.h"
 #include "drivers/LOG/klog.h"
 #include "drivers/CONSOLE/console.h"
+#include "drivers/GRAPHICS/gfx.h"
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
 #include "drivers/INTERRUPTS/kb.h"
@@ -21,6 +22,9 @@ int kmain(unsigned int ebx) {
 
   init_paging();
 
+  multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+
+  gfx_init(mbinfo);
   display_init();
   klog_init(KLOG_SINK_BOTH);
   klog_write_string("x86-os display initialized\n");
@@ -31,7 +35,6 @@ int kmain(unsigned int ebx) {
   console_init();
   console_run();
 
-  multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;
   unsigned int address_of_module = modules->mod_start;
   // unsigned int size = modules->mod_end - modules->mod_start;

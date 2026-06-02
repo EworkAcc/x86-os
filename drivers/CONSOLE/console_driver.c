@@ -3,6 +3,8 @@
 #include "../FILESYSTEM/fs.h"
 #include "../INTERRUPTS/kb.h"
 #include "../LOG/klog.h"
+#include "../WIDGETS/widgets.h"
+#include "../GRAPHICS/gfx.h"
 
 #define CONSOLE_MAX_COMMAND 128
 #define CONSOLE_MAX_ARGS 4
@@ -65,7 +67,7 @@ static void console_write_uint(unsigned int value) {
 }
 
 static void console_print_status(void) {
-  display_set_status(" x86-os console | commands: help clear ls cat mkdir touch stat | stdout mirrors to COM1 ");
+  widget_draw_status(" x86-os console | help clear ls cat mkdir touch stat widgets gfx ", "COM1+VGA");
 }
 
 void console_print_prompt(void) {
@@ -83,6 +85,8 @@ static void console_cmd_help(void) {
   klog_write_string("  mkdir <path>      create a directory\n");
   klog_write_string("  touch <path>      create an empty file\n");
   klog_write_string("  stat <path>       show type, size, mode and timestamps\n");
+  klog_write_string("  widgets           draw text UI widgets demo\n");
+  klog_write_string("  gfx               show framebuffer graphics info\n");
 }
 
 static void console_cmd_clear(void) {
@@ -202,6 +206,63 @@ static void console_cmd_stat(int argc, char *argv[]) {
   klog_write("\n", 1);
 }
 
+
+static void console_cmd_widgets(void) {
+  static const char *menu_items[] = {
+    "Filesystem browser",
+    "Process monitor",
+    "Settings",
+    "Shutdown"
+  };
+  static const char *list_items[] = {
+    "/",
+    "/readme",
+    "/docs",
+    "Use ls/cat/stat commands"
+  };
+  struct text_menu menu;
+
+  display_clear();
+  console_print_status();
+  widget_draw_box(1, 2, 36, 8, "Console Widget Demo");
+  display_write_at(3, 5, "bordered boxes", 14, DISPLAY_COLOR_WHITE, DISPLAY_COLOR_BLACK);
+  display_write_at(4, 5, "status bar", 10, DISPLAY_COLOR_LIGHT_GREEN, DISPLAY_COLOR_BLACK);
+  display_write_at(5, 5, "menus + lists", 13, DISPLAY_COLOR_LIGHT_BROWN, DISPLAY_COLOR_BLACK);
+
+  menu.title = "Main Menu";
+  menu.items = menu_items;
+  menu.count = 4;
+  menu.selected = 1;
+  widget_draw_menu(1, 42, 30, &menu);
+
+  widget_draw_box(11, 2, 70, 8, "Selectable List");
+  widget_draw_list(13, 4, 66, list_items, 4, 2);
+
+  display_set_cursor(21, 0);
+  klog_write_string("widgets: text UI demo drawn. Type clear to return to a clean console.\n");
+}
+
+static void console_cmd_gfx(void) {
+  const struct gfx_state *state = gfx_get_state();
+
+  if(!gfx_is_available()) {
+    klog_write_string("gfx: RGB pixel framebuffer not available from multiboot info\n");
+    klog_write_string("gfx: text VGA console remains active at 0xb8000\n");
+    return;
+  }
+
+  klog_write_string("gfx: framebuffer available\nwidth: ");
+  console_write_uint(state->width);
+  klog_write_string("\nheight: ");
+  console_write_uint(state->height);
+  klog_write_string("\npitch: ");
+  console_write_uint(state->pitch);
+  klog_write_string("\nbpp: ");
+  console_write_uint(state->bpp);
+  klog_write_string("\n");
+  gfx_demo();
+}
+
 static void console_execute(char *command) {
   char local[CONSOLE_MAX_COMMAND];
   char *argv[CONSOLE_MAX_ARGS];
@@ -218,6 +279,8 @@ static void console_execute(char *command) {
   else if(console_streq(argv[0], "mkdir")) console_cmd_mkdir(argc, argv);
   else if(console_streq(argv[0], "touch")) console_cmd_touch(argc, argv);
   else if(console_streq(argv[0], "stat")) console_cmd_stat(argc, argv);
+  else if(console_streq(argv[0], "widgets")) console_cmd_widgets();
+  else if(console_streq(argv[0], "gfx")) console_cmd_gfx();
   else klog_write_string("unknown command; try help\n");
 }
 
