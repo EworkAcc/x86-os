@@ -6,6 +6,7 @@
 #include "drivers/LOG/klog.h"
 #include "drivers/CONSOLE/console.h"
 #include "drivers/GRAPHICS/gfx.h"
+#include "drivers/EVENTS/events.h"
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
 #include "drivers/INTERRUPTS/kb.h"
@@ -32,6 +33,7 @@ int kmain(unsigned int ebx) {
   filesystem_init();
   klog_write_string("filesystem initialized\n");
 
+  input_events_init();
   console_init();
   console_run();
 

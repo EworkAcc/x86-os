@@ -5,6 +5,8 @@
 #include "../LOG/klog.h"
 #include "../WIDGETS/widgets.h"
 #include "../GRAPHICS/gfx.h"
+#include "../EVENTS/events.h"
+#include "../DESKTOP/desktop.h"
 
 #define CONSOLE_MAX_COMMAND 128
 #define CONSOLE_MAX_ARGS 4
@@ -67,7 +69,7 @@ static void console_write_uint(unsigned int value) {
 }
 
 static void console_print_status(void) {
-  widget_draw_status(" x86-os console | help clear ls cat mkdir touch stat widgets gfx ", "COM1+VGA");
+  widget_draw_status(" x86-os console | help clear ls cat mkdir touch stat widgets gfx desktop ", "COM1+VGA");
 }
 
 void console_print_prompt(void) {
@@ -87,6 +89,7 @@ static void console_cmd_help(void) {
   klog_write_string("  stat <path>       show type, size, mode and timestamps\n");
   klog_write_string("  widgets           draw text UI widgets demo\n");
   klog_write_string("  gfx               show framebuffer graphics info\n");
+  klog_write_string("  desktop           start tiny graphics desktop/window manager\n");
 }
 
 static void console_cmd_clear(void) {
@@ -263,6 +266,11 @@ static void console_cmd_gfx(void) {
   gfx_demo();
 }
 
+
+static void console_cmd_desktop(void) {
+  desktop_run();
+}
+
 static void console_execute(char *command) {
   char local[CONSOLE_MAX_COMMAND];
   char *argv[CONSOLE_MAX_ARGS];
@@ -281,6 +289,7 @@ static void console_execute(char *command) {
   else if(console_streq(argv[0], "stat")) console_cmd_stat(argc, argv);
   else if(console_streq(argv[0], "widgets")) console_cmd_widgets();
   else if(console_streq(argv[0], "gfx")) console_cmd_gfx();
+  else if(console_streq(argv[0], "desktop")) console_cmd_desktop();
   else klog_write_string("unknown command; try help\n");
 }
 
@@ -332,22 +341,20 @@ void console_init(void) {
 }
 
 void console_run(void) {
+  struct input_event event;
+
   for(;;) {
-    if(keyboard_has_data()) {
-      unsigned char scan_code = keyboard_read_scan_code();
-      char c;
+    input_poll_keyboard();
+    while(input_pop_event(&event) > 0) {
+      if(event.type != INPUT_EVENT_KEY) continue;
 
-      if(scan_code & 0x80) continue;
-
-      if(scan_code == KEYBOARD_BACKSPACE_SCAN_CODE) {
+      if(event.code == KEYBOARD_BACKSPACE_SCAN_CODE) {
         console_backspace();
         continue;
       }
 
-      if(scan_code > KEYBOARD_MAX_ASCII) continue;
-      c = (char)keyboard_scan_code_to_ascii(scan_code);
-      if(c == 0) continue;
-      console_accept_char(c);
+      if(event.ascii == 0) continue;
+      console_accept_char(event.ascii);
     }
   }
 }
