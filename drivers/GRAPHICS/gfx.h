@@ -18,11 +18,13 @@ struct gfx_state {
   unsigned int pitch;
   unsigned int bpp;
   unsigned char *buffer;
+  const char *unavailable_reason;
 };
 
 void gfx_init(multiboot_info_t *mbinfo);
 int gfx_is_available(void);
 const struct gfx_state *gfx_get_state(void);
+const char *gfx_unavailable_reason(void);
 void gfx_draw_pixel(unsigned int x, unsigned int y, unsigned int color);
 void gfx_draw_rect(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned int color);
 void gfx_draw_char(unsigned int x, unsigned int y, char c, unsigned int foreground, unsigned int background);

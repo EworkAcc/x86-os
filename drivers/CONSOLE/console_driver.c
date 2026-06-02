@@ -249,8 +249,10 @@ static void console_cmd_gfx(void) {
   const struct gfx_state *state = gfx_get_state();
 
   if(!gfx_is_available()) {
-    klog_write_string("gfx: RGB pixel framebuffer not available from multiboot info\n");
-    klog_write_string("gfx: text VGA console remains active at 0xb8000\n");
+    klog_write_string("gfx: RGB pixel framebuffer not available: ");
+    klog_write_string(gfx_unavailable_reason());
+    klog_write_string("\n");
+    klog_write_string("gfx: the bootloader must enter a VBE/RGB graphics mode for desktop\n");
     return;
   }
 

@@ -19,13 +19,21 @@ void gfx_init(multiboot_info_t *mbinfo) {
   gfx.pitch = 0;
   gfx.bpp = 0;
   gfx.buffer = 0;
+  gfx.unavailable_reason = "multiboot info pointer missing";
 
   if(!mbinfo) return;
+
+  gfx.unavailable_reason = "bootloader did not provide framebuffer info";
   if((mbinfo->flags & MULTIBOOT_INFO_FRAMEBUFFER_INFO) == 0) return;
+
+  gfx.unavailable_reason = "framebuffer is not RGB pixel mode";
   if(mbinfo->framebuffer_type != MULTIBOOT_FRAMEBUFFER_TYPE_RGB) return;
+
+  gfx.unavailable_reason = "RGB framebuffer is not 24-bit or 32-bit";
   if(mbinfo->framebuffer_bpp != 24 && mbinfo->framebuffer_bpp != 32) return;
 
   gfx.available = 1;
+  gfx.unavailable_reason = "available";
   gfx.width = mbinfo->framebuffer_width;
   gfx.height = mbinfo->framebuffer_height;
   gfx.pitch = mbinfo->framebuffer_pitch;
@@ -39,6 +47,10 @@ int gfx_is_available(void) {
 
 const struct gfx_state *gfx_get_state(void) {
   return &gfx;
+}
+
+const char *gfx_unavailable_reason(void) {
+  return gfx.unavailable_reason;
 }
 
 void gfx_draw_pixel(unsigned int x, unsigned int y, unsigned int color) {

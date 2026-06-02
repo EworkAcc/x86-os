@@ -238,7 +238,10 @@ void desktop_run(void) {
   struct input_event event;
 
   if(!gfx_is_available()) {
-    klog_write_string("desktop: RGB pixel framebuffer unavailable; staying in text console\n");
+    klog_write_string("desktop: RGB pixel framebuffer unavailable: ");
+    klog_write_string(gfx_unavailable_reason());
+    klog_write_string("\n");
+    klog_write_string("desktop: staying in text console\n");
     return;
   }
 
