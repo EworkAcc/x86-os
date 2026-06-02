@@ -23,7 +23,7 @@ static void display_scroll(void) {
   unsigned int column;
   char *video = (char *)0x000b8000;
 
-  for(row = 1; row < DISPLAY_HEIGHT; row++) {
+  for(row = 1; row < DISPLAY_TEXT_HEIGHT; row++) {
     for(column = 0; column < DISPLAY_WIDTH; column++) {
       unsigned int from = display_cell_offset(row, column);
       unsigned int to = display_cell_offset(row - 1, column);
@@ -33,13 +33,27 @@ static void display_scroll(void) {
   }
 
   for(column = 0; column < DISPLAY_WIDTH; column++) {
-    display_blank_cell(DISPLAY_HEIGHT - 1, column);
+    display_blank_cell(DISPLAY_TEXT_HEIGHT - 1, column);
   }
 }
 
 void display_set_color(unsigned char foreground, unsigned char background) {
   display_foreground = foreground & 0x0f;
   display_background = background & 0x0f;
+}
+
+void display_set_cursor(unsigned int row, unsigned int column) {
+  if(row >= DISPLAY_TEXT_HEIGHT) row = DISPLAY_TEXT_HEIGHT - 1;
+  if(column >= DISPLAY_WIDTH) column = DISPLAY_WIDTH - 1;
+
+  display_row = row;
+  display_column = column;
+  display_update_cursor();
+}
+
+void display_get_cursor(unsigned int *row, unsigned int *column) {
+  if(row) *row = display_row;
+  if(column) *column = display_column;
 }
 
 void display_clear(void) {
@@ -64,7 +78,7 @@ void display_init(void) {
 
 void display_newline(void) {
   display_column = 0;
-  if(display_row + 1 >= DISPLAY_HEIGHT) {
+  if(display_row + 1 >= DISPLAY_TEXT_HEIGHT) {
     display_scroll();
   } else {
     display_row++;
@@ -125,4 +139,34 @@ void display_write_string(const char *string) {
   unsigned int length = 0;
   while(string[length] != 0) length++;
   display_write(string, length);
+}
+
+void display_write_at(unsigned int row, unsigned int column, const char *buffer, unsigned int length, unsigned char foreground, unsigned char background) {
+  unsigned int i;
+  unsigned char old_foreground = display_foreground;
+  unsigned char old_background = display_background;
+
+  if(row >= DISPLAY_HEIGHT || column >= DISPLAY_WIDTH) return;
+
+  display_set_color(foreground, background);
+  for(i = 0; i < length && column + i < DISPLAY_WIDTH; i++) {
+    fb_write_cell(display_cell_offset(row, column + i), buffer[i], display_background, display_foreground);
+  }
+  display_set_color(old_foreground, old_background);
+  display_update_cursor();
+}
+
+void display_set_status(const char *status) {
+  unsigned int i;
+  unsigned char old_foreground = display_foreground;
+  unsigned char old_background = display_background;
+
+  display_set_color(DISPLAY_COLOR_BLACK, DISPLAY_COLOR_LIGHT_GREY);
+  for(i = 0; i < DISPLAY_WIDTH; i++) {
+    char c = ' ';
+    if(status && status[i] != 0) c = status[i];
+    fb_write_cell(display_cell_offset(DISPLAY_HEIGHT - 1, i), c, display_background, display_foreground);
+  }
+  display_set_color(old_foreground, old_background);
+  display_update_cursor();
 }

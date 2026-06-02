@@ -4,6 +4,7 @@
 #include "drivers/FB/fb.h"
 #include "drivers/DISPLAY/display.h"
 #include "drivers/LOG/klog.h"
+#include "drivers/CONSOLE/console.h"
 #include "drivers/INTERRUPTS/pic.h"
 #include "drivers/INTERRUPTS/interrupt.h"
 #include "drivers/INTERRUPTS/kb.h"
@@ -26,6 +27,9 @@ int kmain(unsigned int ebx) {
 
   filesystem_init();
   klog_write_string("filesystem initialized\n");
+
+  console_init();
+  console_run();
 
   multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
   multiboot_module_t* modules = (multiboot_module_t *) mbinfo->mods_addr;

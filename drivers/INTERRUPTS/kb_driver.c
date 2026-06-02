@@ -1,6 +1,10 @@
 #include "../IO/io.h"
 #include "kb.h"
 
+int keyboard_has_data(void) {
+  return (inb(KEYBOARD_STATUS_PORT) & KEYBOARD_STATUS_OUTPUT_FULL) != 0;
+}
+
 unsigned char keyboard_read_scan_code(void) {
   return inb(KEYBOARD_DATA_PORT);
 }

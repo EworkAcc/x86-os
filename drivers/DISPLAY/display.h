@@ -3,6 +3,7 @@
 
 #define DISPLAY_WIDTH 80
 #define DISPLAY_HEIGHT 25
+#define DISPLAY_TEXT_HEIGHT (DISPLAY_HEIGHT - 1)
 
 #define DISPLAY_COLOR_BLACK 0
 #define DISPLAY_COLOR_BLUE 1
@@ -24,9 +25,13 @@
 void display_init(void);
 void display_clear(void);
 void display_set_color(unsigned char foreground, unsigned char background);
+void display_set_cursor(unsigned int row, unsigned int column);
+void display_get_cursor(unsigned int *row, unsigned int *column);
 void display_putc(char c);
 void display_write(const char *buffer, unsigned int length);
 void display_write_string(const char *string);
+void display_write_at(unsigned int row, unsigned int column, const char *buffer, unsigned int length, unsigned char foreground, unsigned char background);
+void display_set_status(const char *status);
 void display_newline(void);
 void display_backspace(void);
 
