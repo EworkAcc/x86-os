@@ -35,6 +35,7 @@ typedef struct page_directory {
 } page_directory_t;
 
 void init_paging();
+void paging_identity_map_range_4mb(unsigned int physical_start, unsigned int size);
 void page_fault();
 
 #endif

@@ -122,6 +122,44 @@ struct multiboot_info
 };
 typedef struct multiboot_info multiboot_info_t;
 
+struct multiboot_vbe_mode_info
+{
+  multiboot_uint16_t mode_attributes;
+  multiboot_uint8_t win_a_attributes;
+  multiboot_uint8_t win_b_attributes;
+  multiboot_uint16_t win_granularity;
+  multiboot_uint16_t win_size;
+  multiboot_uint16_t win_a_segment;
+  multiboot_uint16_t win_b_segment;
+  multiboot_uint32_t win_func_ptr;
+  multiboot_uint16_t pitch;
+  multiboot_uint16_t width;
+  multiboot_uint16_t height;
+  multiboot_uint8_t w_char;
+  multiboot_uint8_t y_char;
+  multiboot_uint8_t planes;
+  multiboot_uint8_t bpp;
+  multiboot_uint8_t banks;
+  multiboot_uint8_t memory_model;
+  multiboot_uint8_t bank_size;
+  multiboot_uint8_t image_pages;
+  multiboot_uint8_t reserved0;
+  multiboot_uint8_t red_mask_size;
+  multiboot_uint8_t red_field_position;
+  multiboot_uint8_t green_mask_size;
+  multiboot_uint8_t green_field_position;
+  multiboot_uint8_t blue_mask_size;
+  multiboot_uint8_t blue_field_position;
+  multiboot_uint8_t reserved_mask_size;
+  multiboot_uint8_t reserved_field_position;
+  multiboot_uint8_t direct_color_mode_info;
+  multiboot_uint32_t framebuffer_addr;
+  multiboot_uint32_t offscreen_memory_offset;
+  multiboot_uint16_t offscreen_memory_size;
+  multiboot_uint8_t reserved1[206];
+} __attribute__((packed));
+typedef struct multiboot_vbe_mode_info multiboot_vbe_mode_info_t;
+
 struct multiboot_color
 {
   multiboot_uint8_t red;
