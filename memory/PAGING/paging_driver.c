@@ -23,6 +23,23 @@ void init_paging() {
   enable_paging(page_directory);
 }
 
+void paging_identity_map_range_4mb(unsigned int physical_start, unsigned int size) {
+  unsigned int start;
+  unsigned int end;
+  unsigned int index;
+
+  if(size == 0) return;
+
+  start = physical_start & 0xffc00000;
+  end = (physical_start + size - 1) & 0xffc00000;
+
+  for(index = start >> 22; index <= (end >> 22) && index < NUM_PAGES; index++) {
+    page_directory[index] = (index << 22) | 0x00000087;
+  }
+
+  enable_paging(page_directory);
+}
+
 void page_fault() {
   char message[] = "Page Fault";
   serial_write(message, sizeof(message));

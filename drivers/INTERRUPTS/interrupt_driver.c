@@ -4,6 +4,8 @@
 #include "../IO/io.h"
 #include "../FB/fb.h"
 #include "../SP/sp.h"
+#include "../LOG/klog.h"
+#include "../SYSCALLS/syscalls.h"
 #include "../../memory/PAGING/paging.h"
 
 static const char *interrupt_names[32] = {
@@ -120,6 +122,7 @@ void interrupts_install_idt() {
   interrupts_init_descriptor(32, (unsigned int) interrupt_handler_32);
 
   interrupts_init_descriptor(INTERRUPTS_KEYBOARD, (unsigned int) interrupt_handler_33);
+  interrupts_init_descriptor(SYSCALL_INTERRUPT_VECTOR, (unsigned int) interrupt_handler_128);
 
   idt.address = (int) &idt_descriptors;
   idt.size = sizeof(struct IDTDescriptor) * INTERRUPTS_DESCRIPTOR_COUNT - 1;
@@ -137,15 +140,20 @@ static void serial_write_hex(unsigned int value) {
     value >>= 4;
   }
   hex[8] = 0;
-  serial_write(hex, 8);
+  klog_write(hex, 8);
 }
 
 void interrupt_handler(__attribute__((unused)) struct cpu_state *cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state *stack) {
+  if(interrupt == SYSCALL_INTERRUPT_VECTOR) {
+    cpu->eax = (unsigned int)syscall_dispatch(cpu);
+    return;
+  }
+
   if(interrupt == INTERRUPTS_KEYBOARD) {
     unsigned char scan_code = keyboard_read_scan_code();
     if(scan_code <= KEYBOARD_MAX_ASCII) {
       char c = keyboard_scan_code_to_ascii(scan_code);
-      serial_write(&c, 1);
+      klog_write(&c, 1);
     }
     pic_acknowledge(interrupt);
     return;
@@ -156,52 +164,52 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state *cpu, unsigned i
     return;
   }
 
-  serial_write("cpu exception", 13);
+  klog_write("cpu exception", 13);
 
   if(interrupt < 32) {
     const char *name = interrupt_names[interrupt];
     int len = 0;
     while(name[len]) len++;
-    serial_write((char*)name, len);
+    klog_write((char*)name, len);
   }
 
-  serial_write("\nINT: 0x", 8);
+  klog_write("\nINT: 0x", 8);
   serial_write_hex(interrupt);
   
-  serial_write("\nEIP: 0x", 9);
+  klog_write("\nEIP: 0x", 9);
   serial_write_hex(stack->eip);
 
-  serial_write("\nCS: 0x", 9);
+  klog_write("\nCS: 0x", 9);
   serial_write_hex(stack->cs);
 
-  serial_write("\nEFLAGS: 0x", 12);
+  klog_write("\nEFLAGS: 0x", 12);
   serial_write_hex(stack->eflags);
 
-  serial_write("\nERROR CODE: 0x", 16);
+  klog_write("\nERROR CODE: 0x", 16);
   serial_write_hex(stack->error_code);
 
-  serial_write("\nEAX: 0x", 9); 
+  klog_write("\nEAX: 0x", 9); 
   serial_write_hex(cpu->eax);
 
-  serial_write("\nEBX: 0x", 9); 
+  klog_write("\nEBX: 0x", 9); 
   serial_write_hex(cpu->ebx);
 
-  serial_write("\nECX: 0x", 9); 
+  klog_write("\nECX: 0x", 9); 
   serial_write_hex(cpu->ecx);
 
-  serial_write("\nEDX: 0x", 9); 
+  klog_write("\nEDX: 0x", 9); 
   serial_write_hex(cpu->edx);
 
-  serial_write("\nEBP: 0x", 9); 
+  klog_write("\nEBP: 0x", 9); 
   serial_write_hex(cpu->ebp);
 
-  serial_write("\nESI: 0x", 9); 
+  klog_write("\nESI: 0x", 9); 
   serial_write_hex(cpu->esi);
 
-  serial_write("\nEDI: 0x", 9); 
+  klog_write("\nEDI: 0x", 9); 
   serial_write_hex(cpu->edi);
 
-  serial_write("\nSYSTEM HALTED\n", 16);
+  klog_write("\nSYSTEM HALTED\n", 16);
 
   for (;;) {
     asm volatile ("cli; hlt");
